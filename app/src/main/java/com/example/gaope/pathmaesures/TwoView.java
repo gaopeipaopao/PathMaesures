@@ -88,13 +88,8 @@ public class TwoView extends View {
      */
     private Path path;
     private Path path1;
+    private Path path2;
 
-
-    /**
-     *
-     * @param context
-     * @param attrs
-     */
 
     public TwoView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -137,12 +132,13 @@ public class TwoView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawColor(Color.parseColor("#f4ea2a"));
+        canvas.drawColor(Color.parseColor("#cdcdcd"));
         canvas.translate(getWidth()/2,getHeight()/2);
 
 
 
         if (begain){
+            Log.d(TAG,"abababb");
             //初始状态
             canvas.drawPath(pathMagnifier,paint);
             begain = false;
@@ -152,7 +148,7 @@ public class TwoView extends View {
         }
 
         if (becomePoint){
-           // Log.d("aaa","aaaa");
+            //Log.d("aaa","aaaa");
             if (path == null){
                 path = new Path();
                 //从放大镜变为一个点
@@ -175,14 +171,14 @@ public class TwoView extends View {
             if (path1 == null){
                 path1 = new Path();
                 pm.setPath(pathCrile,false);
-                Log.d(TAG,"ecec");
+                //Log.d(TAG,"ecec");
                 //绕圆环运动
                 runningCrileAnimation();
             } else {
                 path.reset();
                 //逆着来画外部的圆
-                Log.d(TAG,"curr:"+curr);
-                Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
+              //  Log.d(TAG,"curr:"+curr);
+               // Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
                 if (curr >= 0.8){
                     pm.getSegment(curr * pm.getLength() - 20,curr * pm.getLength(),path,true);
                     canvas.drawPath(path,paint);
@@ -214,12 +210,24 @@ public class TwoView extends View {
 //            runningCrile = false;
 //            becomeCrile = true;
         }
-//        if (becomeCrile){
-//            //变为放大镜
-//            becomeCrileAnimation();
-//            runningCrile = false;
-//            becomeCrile = true;
-//        }
+        if (becomeCrile){
+
+            if (path2 == null){
+                Log.d(TAG,TAG);
+                pm.setPath(pathMagnifier,false);
+                path2 = new Path();
+                curr = 1;
+                //变为放大镜
+                becomeCrileAnimation();
+            }else {
+                path.reset();
+                pm.getSegment(curr * pm.getLength(),pm.getLength(),path,true);
+                Log.d(TAG,"curr:"+curr);
+                Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
+                canvas.drawPath(path,paint);
+            }
+
+        }
 
 
 
@@ -232,6 +240,26 @@ public class TwoView extends View {
     }
 
     private void becomeCrileAnimation() {
+
+        ValueAnimator value = ValueAnimator.ofFloat(1,0);
+        value.setDuration(2000);
+        value.setInterpolator(new AccelerateDecelerateInterpolator());
+        value.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                // Log.d(TAG,"bbbbbbb");
+                curr = (float) animation.getAnimatedValue();
+                //  Log.d(TAG,"currb:"+curr);
+                if (curr == 0){
+                   // runningCrile = false;
+                    becomeCrile = false;
+                    begain = true;
+                    //Log.d(TAG,"cccccc");
+                }
+                invalidate();
+            }
+        });
+        value.start();
     }
 
     private void runningCrileAnimation() {
@@ -243,7 +271,7 @@ public class TwoView extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 curr = (float) animation.getAnimatedValue();
-                Log.d(TAG,"currb:"+curr);
+               // Log.d(TAG,"currb:"+curr);
                 if (curr == 0){
                     runningCrile = false;
                     becomeCrile = true;
