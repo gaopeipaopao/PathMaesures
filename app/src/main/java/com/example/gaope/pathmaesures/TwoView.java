@@ -26,6 +26,7 @@ import android.view.animation.LinearInterpolator;
  * 1.从内部放大镜图标变为一个点
  * 2.绕圆环运动
  * 3.从一个点变为一个放大镜
+ *在操作动画时，记得开启的逻辑
  * Created by gaope on 2018/5/24.
  */
 
@@ -86,6 +87,7 @@ public class TwoView extends View {
      *
      */
     private Path path;
+    private Path path1;
 
 
     /**
@@ -150,7 +152,7 @@ public class TwoView extends View {
         }
 
         if (becomePoint){
-            Log.d("aaa","aaaa");
+           // Log.d("aaa","aaaa");
             if (path == null){
                 path = new Path();
                 //从放大镜变为一个点
@@ -158,20 +160,60 @@ public class TwoView extends View {
             }else {
                 path.reset();
                 pm.getSegment(curr * pm.getLength(),pm.getLength(),path,true);
-                Log.d(TAG,"curr:"+curr);
-                Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
+              //  Log.d(TAG,"curr:"+curr);
+              //  Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
                 canvas.drawPath(path,paint);
             }
 //            becomePoint = false;
 //            runningCrile = true;
         }
-        canvas.drawPath(path,paint);
-//        if (runningCrile){
-//            //绕圆环运动
-//            runningCrileAnimation();
+//        canvas.drawPath(path,paint);
+//        path.reset();
+
+        if (runningCrile){
+
+            if (path1 == null){
+                path1 = new Path();
+                pm.setPath(pathCrile,false);
+                Log.d(TAG,"ecec");
+                //绕圆环运动
+                runningCrileAnimation();
+            } else {
+                path.reset();
+                //逆着来画外部的圆
+                Log.d(TAG,"curr:"+curr);
+                Log.d(TAG,"curr * pm.getLength():"+curr * pm.getLength());
+                if (curr >= 0.8){
+                    pm.getSegment(curr * pm.getLength() - 20,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.7){
+                    pm.getSegment(curr * pm.getLength() - 30,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.6){
+                    pm.getSegment(curr * pm.getLength() - 40,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.5){
+                    pm.getSegment(curr * pm.getLength() - 50,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.4){
+                    pm.getSegment(curr * pm.getLength() - 60,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.3){
+                    pm.getSegment(curr * pm.getLength() - 40,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0.2){
+                    pm.getSegment(curr * pm.getLength() - 30,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }else if (curr >= 0){
+                    pm.getSegment(curr * pm.getLength() - 20,curr * pm.getLength(),path,true);
+                    canvas.drawPath(path,paint);
+                }
+//                pm.getSegment(curr * pm.getLength(),pm.getLength(),path,true);
+//                canvas.drawPath(path,paint);
+            }
 //            runningCrile = false;
 //            becomeCrile = true;
-//        }
+        }
 //        if (becomeCrile){
 //            //变为放大镜
 //            becomeCrileAnimation();
@@ -193,6 +235,23 @@ public class TwoView extends View {
     }
 
     private void runningCrileAnimation() {
+
+        ValueAnimator value = ValueAnimator.ofFloat(1,0);
+        value.setDuration(2000);
+        value.setInterpolator(new AccelerateDecelerateInterpolator());
+        value.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                curr = (float) animation.getAnimatedValue();
+                Log.d(TAG,"currb:"+curr);
+                if (curr == 0){
+                    runningCrile = false;
+                    becomeCrile = true;
+                }
+                invalidate();
+            }
+        });
+        value.start();
     }
 
     private void becomePointAnimation() {
@@ -203,12 +262,13 @@ public class TwoView extends View {
         value.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Log.d(TAG,"bbbbbbb");
+               // Log.d(TAG,"bbbbbbb");
                 curr = (float) animation.getAnimatedValue();
-                Log.d(TAG,"currb:"+curr);
-                if (curr >=0.99){
+              //  Log.d(TAG,"currb:"+curr);
+                if (curr == 1){
                     becomePoint = false;
-                    Log.d(TAG,"cccccc");
+                    runningCrile = true;
+                    //Log.d(TAG,"cccccc");
                 }
                 invalidate();
             }
