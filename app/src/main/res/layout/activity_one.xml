@@ -5,17 +5,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
+    <com.example.gaope.pathmaesures.OneView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:id="@+id/one"
-        android:text="getPosTan"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:id="@+id/two"
-        android:text="cubicTo"/>
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>
